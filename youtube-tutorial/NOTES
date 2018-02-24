@@ -1,0 +1,99 @@
+connection.sync(); : This function will make it so that sequelize can look over the models that you've defined, and then generate sequel queries, that will in turn create associated tables.
+
+WHEN YOU'RE READY TO QUERY THE DATA: Instead of embedding sequel, you just use sequelizes friendly api 
+
+THE PURPOSE OF SEQUELIZE: You can have less boilerplate, ultimately making your code qsoer to read, maintain, and extend.
+
+OBJECT IMPEDANCE MISMATCH: The idea here is that relational databases, represent data in tables, and define relationships using foreign keys, whereas object oriented programming languages, like js represent data as objects, and define relationships between objects, using an object graph. If you want to consume relational data inside of your js applications, you somehow need to map, those records and tables to objects in your js applications. Everybody has to do it, it's just a question of whether you're going to do it manually, or if you're going to use a tool, such as sequelize to do that for you. People have been trying to solve this issue using orms (object relational mappers) sequelize is an ORM geared towards javascript
+
+BENEFITS:
+-Write less and more consitent code
+-Mostly avoid writing sequel queries.
+-It abstracts the db engine
+-It does a lot of things automatically (Automation) EXAMPLES: It will automatically escape or parametarize user inputs, helping to prevent sequel injections (You still need to do your part to fully prevent them)
+-Migrations
+
+LIMITATIONS:
+-Complicated queries can be slow  
+-Additional Learning Curve
+-Documentation kinda sucks
+-Loss of flexibility
+
+////////////////////////////////////////////////////////////////////////////////
+							GETTING STARTED 
+1-NPM INIT
+2-INSTALL SEQUELIZE-NODE-MODULE: npm install sequelize --save
+3-INSTALL LOW LEVEL DATA ADAPTER DEPENDING ON THE DB ENGINE YOU'RE USING (In other words this command adapts sequelize to the particular db you're using such as postgres, or SQL): npm install pg pg-hstore --save NOTE: These modules are for internal use by sequelize, and not refferenced by you directly
+
+====================================================================================
+							FILE STRUCTURING
+
+app.js:
+-Here you're going to require sequelize. NOTE: when you define it as a variable or const, make sure you capitalize it, since this is a constructor. The instance you create will be the connector between your js and your db
+	EXAMPLE:
+		var Sequelize = require('sequelize');
+
+		var connection = new Sequelize();
+
+SPECIFYING THE CONNECTION'S PARAMETERS: The first parameter should specify the name of the db that sequelize should connect to. Second, you need to specify the name of the username for your db. Third, you need to specify the password for that user. Fourth: This argument takes the form of an object, and in this object we'll have a dialect property, which will contain the database engine you're using as it's value (Like postgres)
+	EXAMPLE:
+		var connection = new Sequelize(myDbName, mac, 'myPassword', {
+			dialect: 'postgres';
+		});
+This is all the information sequelize needs to connect to the db. Now we can begin to define models using this connection variable
+------------
+
+DEFINING MODELS USING THE CONNECTION OBJECT: You define a model by using the define function on the connection object.
+	THIS FUNCTION TAKES 2 ARGUMENTS
+		1- Name of the model,
+		2- An object, which represents the properties of the 		model. the values for these properties should be  		the datatypes.
+
+	EXAMPLE: 
+		var ModelName = connection.define('modelName', {
+			name: Sequelize.STRING,
+			lastName: Sequelize.STRING,
+			password: Sequelize.INTEGER
+		})
+-------------
+
+SYNCHRONIZING THE DB: connection.sync();
+	This function is first going to connect to the db, then it's going to automatically generate sequel that will create the corresponding table in the database.
+	
+
+
+
+
+
+SEQUELIZE INIT: sequelize init (This will create config, migrations, seeders, and models directories)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+							USEFUL POSTGRES COMMANDS:
+CREATING A NEW SUPERUSER: CREATE USER desiredusername WITH SUPERUSER PASSWORD 12345;
+
+LISTING EXISTING USERS: \du
+
+
+
+
+
+
+
+
+
+
+
+
