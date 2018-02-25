@@ -1,21 +1,25 @@
-const Sequelize = require('sequelize');
 
-//The connection requires the following parameters (databaseName, userName, password);
-//NOTE: It's very important, that you create much more secure passwords, when you actually take any project up to production.
-const connection = new Sequelize('database-play', 'mac', {
-	host: 'localhost',
-	dialect: 'postgres',
-});
+const express = require('express');
+const multer = require('multer');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const urlEncoded = bodyParser.urlencoded({extended: false});
+const app = express();
 
-//CREATING A MODEL
+const entriesRoute = require(__dirname + '/server/routes/entriesRoute.js');
 
-const Userbats = connection.define('userbats', {
-	name: Sequelize.STRING,
-	last: Sequelize.STRING,
-	password: Sequelize.INTEGER
+app.set('view engine', 'ejs');
+app.use(urlEncoded);
+app.use(multer);
+app.use(cookieParser);
+app.use('/', express.static('./statics'));
+
+module.exports = app.js;
+
+app.get('/' , function(req, res){
+  render('entries.ejs')
 })
 
-
-//SYNCING WITH YOUR DB
-
-connection.sync();
+app.listen(4000, function(){
+  console.log('Listening to port 4000');
+})
