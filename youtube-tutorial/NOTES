@@ -43,6 +43,9 @@ SPECIFYING THE CONNECTION'S PARAMETERS: The first parameter should specify the n
 This is all the information sequelize needs to connect to the db. Now we can begin to define models using this connection variable
 ------------
 
+SEQUELIZE INIT: sequelize init (This will create config, migrations, seeders, and models directories)
+------------
+
 DEFINING MODELS USING THE CONNECTION OBJECT: You define a model by using the define function on the connection object.
 	THIS FUNCTION TAKES 2 ARGUMENTS
 		1- Name of the model,
@@ -76,11 +79,137 @@ Within the callback function pass in model name that you want to assign to it, a
 		})
 
 		This will generate an insert query!
-
-
-
 --------------
-SEQUELIZE INIT: sequelize init (This will create config, migrations, seeders, and models directories)
+
+RETRIEVING A RECORD BACK AGAIN: When you create a record (the content inside your model/table), a record id is generated (I think this is the primary key id, but I'm not sure)
+	This is the exact same setup as inserting records, but instead of putting the model's attributes inside the callback, we put the model's name followed by findById, and then specify the id of the record
+	(Again note that we're saying connection because that's what we called our sequelize instance). Now use the then function and pass a callback within it. Inside the cb you specify where you want that data
+	to output by using the .dataValues(I don't know if this is a preset attribute or not.)
+		EXAMPLE:
+			connection.sync().then(function(){
+				ModelName.findById(2).then(function(article){
+					console.log(modelName.dataValues);
+				});
+			});
+
+	FINDING THE ID OF A RECORD: Instead of using findById, you can use findAll method, and don't pass any arguments to the findAll() function, and instead of passing in article as a parameter to the callback,
+	I'll pluralize it since now we want to find all articles. You can also print out the length of articles so you get them all
+		EXAMPLE:
+			connection.sync().then(function(){
+				ModelName.findAll().then(function(articles){
+					console.log(articles.length)
+				})
+			})
+--------------------------------------------------------------------------------
+
+CUSTOMIZING MODELS UPON DEFINITION: So first, note that you define it the exact same way as previously shown, but the change happens inside our model attributes. Instead of defining the values directly, we define their values as objects, and inside these objects is where we're going to declare all our specifications. Inside these objects we're going to define our properties.
+
+(type: for the datatype, defaultValue: 'coming soon...'(if no defaultValue then you can specify, or otherwise it'll be automatically specified "coming soon..."), unique: true(This is your unique constraint), allowNull: false(This is the allowNull constraint), )
+	EXAMPLE:
+		const ModelName = connection.define('modelName', {
+			name: {
+
+			},
+			lastName: {
+
+			},
+			password: {
+
+			}
+		}, {
+			timestamp: false, (Use this third argument, only if you wish the disable timestamp)
+			freezeTableName: true (Use this third argument, only if you wish to prevent sequelize from pluralizing your names)
+		});
+
+------------
+
+UPDATING TABLES: NOTE: You can't update tables using the sync function. The sync function only creates a table if it doesn't already exist. If there's an existing table with that name, the sync function will leave it alone, and do nothing.
+
+	FORCE: TRUE: This attribute, will delete, your existing table, with all of it's content, and recreate it with your new specifications. That's how you can update your existing columns.
+		SYNTAX:
+			connection.sync({
+				force: true
+			}).then(function(){
+
+			})
+
+			WARNING: It's highly advisable to not run this code in your production stage db, because this database, contains user information that will be deleted.
+-------------
+
+CREATING A CUSTOM PRIMARY KEY FOR MY MODELS: You must first create a column which will replace your primary key column
+	EXAMPLE:
+		slug: {
+		type: Sequelize.STRING,
+		primaryKey: true
+		}
+
+		The primaryKey: true attribute tells sequelize that the column this attribute belongs to should serve as the primary key, and that it should not generate one automatically .
+--------------
+
+ERROR HANDLING: We should include an exception handler. If an error occurs within this callback function, that error will be passed through the catch handler, where we can handle it with grace.
+For the purpose of this tutorial, we'll simply pass any errors that may occur, the way they are.
+	EXAMPLE:
+		connect
+			.sync({
+				force: true,
+				logging: console.log
+			})
+			.then(function(){
+
+			}).catch(function(error){
+				console.log(error);
+			})
+
+---------------
+
+	VALIDATION: As you may have noticed, we're already asking sequelize to validate data before inserting it to the database, but if you want to specify more precise validation rules, then you need to utilize what's known as model validation. There's a ton of validation rules at your disposal (see seqeuelizejs.com Reference, and find the validations section. That has the whole list.)
+		NOTE: You can take any of these validation rules, and associate one or more to any of the model properties.
+
+		VALIDATE: To associate validation rules to the model properties, all you have to do is define an attribute called validate, and on that attribute specify one or more validation rules.
+			EXAMPLE:
+				title: {
+					type: Sequelize.STRING,
+					unique: true,
+					allowNull: false,
+					validate: {
+					len: [5, 250] This validation for example makes it so that the acceptable length of the title is between 5 and 250 characters, it'll reject, any other length.
+					}
+				}
+
+				CUSTOMIZING THE ERROR VALIDATION ERROR TO BE USER FRIENDLY: pass in an object, as the desired validation, and within it specify how you want that error to display. Within this object use the attribute called msg (Here's where you write the message you want)
+				NOTE: args(is where you specify the values of your chosen validation rule)
+					EXAMPLE:
+						title: {
+						type: Sequelize.STRING,
+						unique: true,
+						allowNull: false,
+						validate: {
+									len: {
+										args: [5, 250],
+										msg: 'Please enter a title with at least 5 characters, but no more than 250'
+									}
+							}
+						}
+
+						NOTE: If your property is set to null: true (Which is it's default behavior), and the user leaves it blank, then it will not catch any of your pre-defined errors.
+
+						SETTING A FULLY CUSTOMIZED VALIDATION RULE: In case you want to set a validation rule that is not predefined. Note, you also define it within the validate: property.
+						All you have to do is define a property whose identifier is the name of your validator, and whose value is a function that takes the value, as a parameter that you wish to validate.
+							EXAMPLE:
+								title: {
+								validate: {
+									startsWithUpper: function(bodyVal) {
+										var first = string.charAt(0);
+										var startsWithUpper = first === first.toUpperCase();
+										if(!startsWithUpper){
+											throw new Error('First letter must be uppercase')
+										}
+									}
+								}
+								}
+
+
+
 
 
 

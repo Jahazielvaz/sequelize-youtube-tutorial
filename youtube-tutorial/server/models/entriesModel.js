@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize');
 const sequelizeInstance = new Sequelize('journal_entries', 'KupidoExportLLC', {
-  dialect: 'postgres'
+  dialect: 'postgres',
+  operatorsAliases: false
 });
-const Op = Sequelize.Op;
 
 
 module.exports = function(sequelizeInstance, DataTypes){
@@ -11,6 +11,8 @@ const Entries = sequelizeInstance.define('entries', {
   title: Sequelize.STRING,
   content: Sequelize.TEXT
 })
+
+
 
 Entries.sync().then(function(){
   Entries.create({
