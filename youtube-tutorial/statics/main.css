@@ -12,3 +12,11 @@ a{
 body{
   background: lightblue;
 }
+
+form{
+  margin: 30px;
+}
+
+textarea{
+  resize: none;
+}

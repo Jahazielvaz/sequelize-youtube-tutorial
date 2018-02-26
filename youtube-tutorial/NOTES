@@ -1,6 +1,6 @@
 connection.sync(); : This function will make it so that sequelize can look over the models that you've defined, and then generate sequel queries, that will in turn create associated tables.
 
-WHEN YOU'RE READY TO QUERY THE DATA: Instead of embedding sequel, you just use sequelizes friendly api 
+WHEN YOU'RE READY TO QUERY THE DATA: Instead of embedding sequel, you just use sequelizes friendly api
 
 THE PURPOSE OF SEQUELIZE: You can have less boilerplate, ultimately making your code qsoer to read, maintain, and extend.
 
@@ -14,13 +14,13 @@ BENEFITS:
 -Migrations
 
 LIMITATIONS:
--Complicated queries can be slow  
+-Complicated queries can be slow
 -Additional Learning Curve
 -Documentation kinda sucks
 -Loss of flexibility
 
 ////////////////////////////////////////////////////////////////////////////////
-							GETTING STARTED 
+							GETTING STARTED
 1-NPM INIT
 2-INSTALL SEQUELIZE-NODE-MODULE: npm install sequelize --save
 3-INSTALL LOW LEVEL DATA ADAPTER DEPENDING ON THE DB ENGINE YOU'RE USING (In other words this command adapts sequelize to the particular db you're using such as postgres, or SQL): npm install pg pg-hstore --save NOTE: These modules are for internal use by sequelize, and not refferenced by you directly
@@ -48,7 +48,7 @@ DEFINING MODELS USING THE CONNECTION OBJECT: You define a model by using the def
 		1- Name of the model,
 		2- An object, which represents the properties of the 		model. the values for these properties should be  		the datatypes.
 
-	EXAMPLE: 
+	EXAMPLE:
 		var ModelName = connection.define('modelName', {
 			name: Sequelize.STRING,
 			lastName: Sequelize.STRING,
@@ -58,12 +58,28 @@ DEFINING MODELS USING THE CONNECTION OBJECT: You define a model by using the def
 
 SYNCHRONIZING THE DB: connection.sync();
 	This function is first going to connect to the db, then it's going to automatically generate sequel that will create the corresponding table in the database.
-	
+
+
+-------------
+
+INSERTING RECORDS IN A TABLE USING SEQUELIZE: To begin with, note that you're going to use promise syntax for inserting records, so you're going to have to get good a promises
+
+THIS STRUCTURE: connect the sync function to the then function using dot notation. Then pass a callback function inside the then function.
+Within the callback function pass in model name that you want to assign to it, and access the built in create property function. You pass in a object within your create function, and in that object, you're going to pass in your model attributes, and you're going to define their values to what ever you want it to be.
+	EXAMPLE:
+		connection.sync().then(function(){
+			ModelName.create({
+				name: 'This is just a demo',
+				lastName: 'This is where the last name would go',
+				password: 'This is where the password would go'
+			})
+		})
+
+		This will generate an insert query!
 
 
 
-
-
+--------------
 SEQUELIZE INIT: sequelize init (This will create config, migrations, seeders, and models directories)
 
 
@@ -87,13 +103,15 @@ CREATING A NEW SUPERUSER: CREATE USER desiredusername WITH SUPERUSER PASSWORD 12
 LISTING EXISTING USERS: \du
 
 
+////////////////////////////////////////////////////////////////////////////////
+							UNRELATED IMPORTANT THINGS TO REMEMBER
+REQ.QUERY: Will return a js object, after query string is parsed
+		EXAMPLE:
+			/user?name=tom&age=55 - req.query would yield {name:"tom", age: "55"}
 
+REQ.PARAMS: Will return parameters in the matched route.
+	 If your route is /user/:id and you make a request to /user/5 - req.params would yield {id: "5"}
+	 Req.params is a function that peels parameters out of the request
 
-
-
-
-
-
-
-
-
+REQ.BODY: This is used on a post request, after you have used body-parser. req.body will contain the
+form value  regardless of format, into it's parsed js version.

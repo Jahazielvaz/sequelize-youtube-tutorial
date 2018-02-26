@@ -1,9 +1,11 @@
 
+const express = require('express');
+const router = express.Router();
+const entriesModel = require('../models/entriesModel.js');
 
-module.exports = function(app){
 router.get('/', function(req, res){
   console.log('This route working fine');
-  res.render('entries.ejs');
+  res.render('entries.ejs', entriesModel);
 });
 
-};
+module.exports = router;

@@ -1,6 +1,7 @@
-const express = require('express');
-const router = express.Router();
+const http = require('http')
+const app = require('../app.js');
+const server = http.createServer(app);
 
-const main = require('../app.js');
-
-router.listen(4000)
+server.listen(4000, function(){
+console.log('Port 4000 Yolo!');
+});
