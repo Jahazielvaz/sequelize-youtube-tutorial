@@ -199,7 +199,7 @@ For the purpose of this tutorial, we'll simply pass any errors that may occur, t
 								title: {
 								validate: {
 									startsWithUpper: function(bodyVal) {
-										var first = string.charAt(0);
+										var first = bodyVal.charAt(0);
 										var startsWithUpper = first === first.toUpperCase();
 										if(!startsWithUpper){
 											throw new Error('First letter must be uppercase')
@@ -207,14 +207,94 @@ For the purpose of this tutorial, we'll simply pass any errors that may occur, t
 									}
 								}
 								}
+---------------------------------------------------------------------------
 
+HOOKS: These are middleware, and they're not specific to Sequelize. Hooks are a general programming principle. A hook is essentially an extensibility point provided by a library that allows your program to react when otherwise internal events occur. You can also potentially augment or replace built in functionalities in hooks, it depends on the library.
+Sequelize hooks enable your program to react when internal sequelize events occur.
+	First we define hooks in a hook: property. This property is located in the options argument for your model name. See example below
+		EXAMPLE:
+			var ModelName = connection.define('modelName', {
+				slug: {
+					Type: Sequelize.STRING,
+					primaryKey: true
+				}, {
+					//HERE'S WHERE YOUR HOOKS GO.
+				}
+			})
 
+			HOOK EXAMPLE:
+				{
+					hooks: {
+						beforeValidate: function(){
+						 This function will execute just before sequelize validates a record.
 
+						 console.log('beforeValidate')
+						},
+						afterValidate: function(){
+							This function will execute just after sequelize validates a record. NOTE: After validation, Naturally, Sequelize will attempt to create the record. It is also possible to hook into that functionality using the beforeCreate, and afterCreate hooks.
 
+							console.log('afterValidate');
+						},
+						beforeCreate: function(){
+							console.log('beforeCreate');
+						},
+						afterCreate: function(){
+							console.log('afterCreate');
+						}
+					}
+				}
 
+				There's a hooks section in sequelizejs.com Look for it and study them. From what I can gather, the hooks in this particular case mainly control the order in which things happen in sequelize. I wonder if there are hooks in JS, and if so, I wonder if they do the same thing.
 
+				In some cases the hook functions are provided with context via their arguments. For example, the afterCreate function, that optionally take an argument called res, which is the result of the create operation
+					EXAMPLE:
+						afterCreate function(res){
+							console.log('afterCreate: Created article with slug', res.dataValues.slug);
+						}
 
+						NOTE: These arguments are not well documented, so a lot of this is going to be trial and error, or reading source code.
 
+						NOTE: There are other ways of defining your hooks for your models.
+
+						NOTE: the only secure way to store a user's password, is using an adapted hash function like bcrypt (Make sure you get good at this section.)
+						This being said, you can set a constraint in sequelize which makes it so that you unconditionally have to hash all your passwords
+							EXAMPLE:
+								hooks: {
+									afterValidate: function(user){
+									user.password = bcrypt.hashSync(user.password, 8)
+									}
+								}
+
+								This code above, will pretty much encrypt all your passwords.
+
+---------------------------------------------------------------------------
+
+CRUD OPERATIONS: These are the 4 fundamental functions of sequelize.
+	CREATING, READING, UPDATING, and DELETING records
+
+	CREATING:
+
+		PERSISTING RECORD: First of all, let's talking about the way we previously learned to create records. According to the sequelize documentation, what we're doing here is creating a persistence instance of the model. In simple words, as soon as you call the create method, internally sequelize will immediate persist the model instance to the db. Meaning, it immediately creates the record on the table as soon as you run the code.
+
+		NON PERSISTENT INSTANCE: You can also create a non persistent instance using the model's build function.
+			EXAMPLE:
+				var ModelName = connection.define('model', {
+				title: Sequelize.STRING,
+				body: Sequelize.TEXT
+				})
+
+				connection
+				.sync({
+					force: true
+				})
+				.then(function(){
+					var articleInstance = ModelName.build({
+					title: 'Some title',
+					body: 'Some body'
+					})
+				})
+
+				NOTE: If we run the above articleInstance function, we won't get an error as long as everything is working properly, but a new record won't be automatically created. That's because we have created an instance but we haven't persisted it yet. 
 
 
 
